@@ -1,0 +1,18 @@
+{
+    "cep": "23050102",
+    "logradouro": "Avenida Cesário de Melo",
+    "complemento": "de 2840 a 4266 - lado par",
+    "unidade": null,
+    "bairro": "Campo Grande",
+    "localidade": "Rio de Janeiro",
+    "uf": "RJ",
+    "estado": "Rio de Janeiro",
+    "regiao": "Sudeste",
+    "ibge": "3304557",
+    "gia": null,
+    "ddd": "21",
+    "siafi": "6001",
+    "metadata_arquivo_origem": "dados_cep_20260703_133334.json",
+    "metadata_data_extracao": "2026-07-03 13:33:34",
+    "metadata_data_processamento": "2026-07-03 13:34:10"
+}

@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ExtractionAPI - Dashboard</title>
+    <!-- Google Fonts: Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js from CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-grad: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --accent: #10b981;
+            --accent-grad: linear-gradient(135deg, #3b82f6 0%, #06b6d4 100%);
+            --font-sans: 'Outfit', sans-serif;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(168, 85, 247, 0.15) 0px, transparent 50%);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            min-height: 100vh;
+            padding: 2rem;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header Styles */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo-group h1 {
+            font-size: 2.25rem;
+            font-weight: 700;
+            background: var(--primary-grad);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-group p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-top: 0.25rem;
+        }
+
+        .actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            background: var(--primary-grad);
+            border: none;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            box-shadow: none;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: none;
+        }
+
+        /* Key Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .metric-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 1.75rem;
+            position: relative;
+            overflow: hidden;
+            transition: var(--transition);
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: var(--primary-grad);
+        }
+
+        .metric-card.accent::before {
+            background: var(--accent-grad);
+        }
+
+        .metric-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(255, 255, 255, 0.15);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        .metric-title {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--text-main);
+            line-height: 1.2;
+        }
+
+        .metric-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        /* Charts Layout */
+        .charts-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .charts-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            min-height: 380px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chart-card h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            color: var(--text-main);
+        }
+
+        .chart-container {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Table Card */
+        .table-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .table-header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .search-bar {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 0.75rem 1.25rem;
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            font-size: 0.95rem;
+            outline: none;
+            width: 300px;
+            transition: var(--transition);
+        }
+
+        .search-bar:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            width: 350px;
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            padding: 1rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            font-size: 0.9rem;
+            border-bottom: 1.5px solid var(--card-border);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        td {
+            padding: 1.1rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 0.95rem;
+            color: var(--text-main);
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        tr {
+            transition: var(--transition);
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.02);
+            color: #fff;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .badge-uf {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+        }
+
+        .badge-regiao {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .action-icon {
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: var(--transition);
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+        }
+
+        .action-icon:hover {
+            color: var(--primary);
+            transform: scale(1.15);
+        }
+
+        /* Modal Dialog */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.8);
+            backdrop-filter: blur(8px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            width: 90%;
+            max-width: 600px;
+            padding: 2rem;
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .close-btn:hover {
+            color: white;
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .json-viewer {
+            background: #0f172a;
+            padding: 1.25rem;
+            border-radius: 12px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9rem;
+            color: #38bdf8;
+            overflow-y: auto;
+            max-height: 400px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            line-height: 1.5;
+        }
+
+        /* Loading Overlay */
+        .loader-wrapper {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-color);
+            z-index: 2000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader {
+            width: 48px;
+            height: 48px;
+            border: 5px solid rgba(99, 102, 241, 0.2);
+            border-bottom-color: var(--primary);
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loader-wrapper" id="loader">
+        <div class="loader"></div>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="logo-group">
+                <h1>ExtractionAPI Dashboard</h1>
+                <p>Data Lake House Analytics (Bronze, Silver, Gold)</p>
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="window.location.reload()">
+                    Atualizar Dados
+                </button>
+            </div>
+        </header>
+
+        <!-- Metric Cards -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-title">Total CEPs Processados</div>
+                <div class="metric-value" id="metric-total">0</div>
+                <div class="metric-sub" id="metric-total-sub">Processamento ativo</div>
+            </div>
+            <div class="metric-card accent">
+                <div class="metric-title">Estados (UF) Cobertos</div>
+                <div class="metric-value" id="metric-uf">0</div>
+                <div class="metric-sub">Distribuição nacional</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-title">Regiões Atendidas</div>
+                <div class="metric-value" id="metric-regiao">0</div>
+                <div class="metric-sub">Agrupados no Data Lake</div>
+            </div>
+        </div>
+
+        <!-- Charts Grid -->
+        <div class="charts-row">
+            <div class="chart-card">
+                <h2>Distribuição por Estado (UF)</h2>
+                <div class="chart-container">
+                    <canvas id="chartUF"></canvas>
+                </div>
+            </div>
+            <div class="chart-card">
+                <h2>Distribuição por Região</h2>
+                <div class="chart-container">
+                    <canvas id="chartRegiao"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table -->
+        <div class="table-card">
+            <div class="table-header">
+                <h2>Registros Processados (Silver)</h2>
+                <input type="text" id="search" class="search-bar" placeholder="Buscar por CEP, Cidade, Logradouro..." oninput="filtrarTabela()">
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CEP</th>
+                            <th>Logradouro</th>
+                            <th>Bairro</th>
+                            <th>Localidade</th>
+                            <th>UF</th>
+                            <th>Região</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        <!-- Dynamic content -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Raw Data Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <button class="close-btn" onclick="fecharModal()">&times;</button>
+            <h3 id="modal-title">Detalhes do CEP</h3>
+            <pre class="json-viewer" id="json-viewer"></pre>
+        </div>
+    </div>
+
+    <script>
+        let dadosCepsGlobal = [];
+        let chartUFInstance = null;
+        let chartRegiaoInstance = null;
+
+        // Ao carregar a página
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await carregarDadosDashboard();
+            } catch (err) {
+                console.error("Erro ao carregar dados do dashboard:", err);
+            } finally {
+                // Esconder loader com transição suave
+                const loader = document.getElementById('loader');
+                loader.style.opacity = 0;
+                setTimeout(() => loader.style.display = 'none', 500);
+            }
+        });
+
+        // Buscar dados das camadas Silver e Gold
+        async function carregarDadosDashboard() {
+            // 1. Carregar métricas Gold
+            const respGold = await fetch('/datalake/gold/relatorio_metricas.json');
+            const dataGold = await respGold.json();
+
+            // 2. Carregar arquivo Silver CSV para a tabela
+            const respSilver = await fetch('/datalake/silver/consolidado_ceps.csv');
+            const csvTexto = await respSilver.text();
+            
+            dadosCepsGlobal = parseCSV(csvTexto);
+
+            // Renderizar tudo
+            atualizarMetricas(dataGold);
+            renderizarGraficos(dataGold);
+            renderizarTabela(dadosCepsGlobal);
+        }
+
+        // Parse simples de CSV
+        function parseCSV(text) {
+            const linhas = text.split('\n').filter(l => l.trim() !== '');
+            if (linhas.length <= 1) return [];
+            
+            const cabecalhos = linhas[0].split(',');
+            const resultados = [];
+
+            for (let i = 1; i < linhas.length; i++) {
+                const colunas = parseLinhaCSV(linhas[i]);
+                if (colunas.length !== cabecalhos.length) continue;
+                
+                const obj = {};
+                cabecalhos.forEach((cab, index) => {
+                    obj[cab.trim()] = colunas[index].trim();
+                });
+                resultados.push(obj);
+            }
+            return resultados;
+        }
+
+        // Trata vírgulas dentro de aspas no CSV
+        function parseLinhaCSV(linha) {
+            const resultado = [];
+            let emAspas = false;
+            let campoAtual = '';
+            
+            for (let i = 0; i < linha.length; i++) {
+                const char = linha[i];
+                if (char === '"') {
+                    emAspas = !emAspas;
+                } else if (char === ',' && !emAspas) {
+                    resultado.push(campoAtual);
+                    campoAtual = '';
+                } else {
+                    campoAtual += char;
+                }
+            }
+            resultado.push(campoAtual);
+            return resultado;
+        }
+
+        // Atualiza os painéis numéricos superiores
+        function atualizarMetricas(goldData) {
+            const total = goldData.metadata.total_registros_analisados;
+            const ufs = Object.keys(goldData.metricas.distribuicao_por_estado).length;
+            const regioes = Object.keys(goldData.metricas.distribuicao_por_regiao).length;
+
+            document.getElementById('metric-total').innerText = total;
+            document.getElementById('metric-uf').innerText = ufs;
+            document.getElementById('metric-regiao').innerText = regioes;
+            document.getElementById('metric-total-sub').innerText = `Atualizado em: ${goldData.metadata.data_geracao_relatorio}`;
+        }
+
+        // Renderiza os gráficos da biblioteca Chart.js
+        function renderizarGraficos(goldData) {
+            // Destruir gráficos existentes se houver re-render
+            if (chartUFInstance) chartUFInstance.destroy();
+            if (chartRegiaoInstance) chartRegiaoInstance.destroy();
+
+            // Configuração para o gráfico de UF (Barras)
+            const ufs = Object.keys(goldData.metricas.distribuicao_por_estado);
+            const ufsValores = Object.values(goldData.metricas.distribuicao_por_estado);
+            
+            const ctxUF = document.getElementById('chartUF').getContext('2d');
+            chartUFInstance = new Chart(ctxUF, {
+                type: 'bar',
+                data: {
+                    labels: ufs,
+                    datasets: [{
+                        label: 'CEPs Cadastrados',
+                        data: ufsValores,
+                        backgroundColor: '#6366f1',
+                        borderRadius: 8,
+                        borderWidth: 0,
+                        barThickness: 30
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#94a3b8', stepSize: 1 }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    }
+                }
+            });
+
+            // Configuração para o gráfico de Regiões (Doughnut)
+            const regioes = Object.keys(goldData.metricas.distribuicao_por_regiao);
+            const regioesValores = Object.values(goldData.metricas.distribuicao_por_regiao);
+
+            const ctxRegiao = document.getElementById('chartRegiao').getContext('2d');
+            chartRegiaoInstance = new Chart(ctxRegiao, {
+                type: 'doughnut',
+                data: {
+                    labels: regioes,
+                    datasets: [{
+                        data: regioesValores,
+                        backgroundColor: ['#10b981', '#3b82f6', '#f59e0b', '#ec4899', '#8b5cf6'],
+                        borderColor: '#1e293b',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { color: '#94a3b8', font: { family: 'Outfit', size: 12 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Renderiza a tabela da camada Silver
+        function renderizarTabela(dados) {
+            const tbody = document.getElementById('table-body');
+            tbody.innerHTML = '';
+
+            if (dados.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; color: var(--text-muted);">Nenhum CEP encontrado.</td></tr>`;
+                return;
+            }
+
+            dados.forEach(cep => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 600; color: #fff;">${formatarCEP(cep.cep)}</td>
+                    <td>${cep.logradouro || '-'}</td>
+                    <td>${cep.bairro || '-'}</td>
+                    <td>${cep.localidade || '-'}</td>
+                    <td><span class="badge badge-uf">${cep.uf}</span></td>
+                    <td><span class="badge badge-regiao">${cep.regiao}</span></td>
+                    <td>
+                        <button class="action-icon" title="Ver JSON completo" onclick="abrirModal('${cep.cep}')">👁️‍🗨️</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function formatarCEP(cep) {
+            if (cep.length === 8) {
+                return cep.substring(0, 5) + '-' + cep.substring(5);
+            }
+            return cep;
+        }
+
+        // Filtro interativo de busca na tabela
+        function filtrarTabela() {
+            const query = document.getElementById('search').value.toLowerCase();
+            const filtrados = dadosCepsGlobal.filter(item => {
+                return (
+                    item.cep.toLowerCase().includes(query) ||
+                    (item.logradouro && item.logradouro.toLowerCase().includes(query)) ||
+                    (item.bairro && item.bairro.toLowerCase().includes(query)) ||
+                    (item.localidade && item.localidade.toLowerCase().includes(query)) ||
+                    item.uf.toLowerCase().includes(query) ||
+                    item.regiao.toLowerCase().includes(query)
+                );
+            });
+            renderizarTabela(filtrados);
+        }
+
+        // Modal para exibir dados brutos da Silver
+        async function abrirModal(cepCodigo) {
+            const modal = document.getElementById('modal');
+            const title = document.getElementById('modal-title');
+            const viewer = document.getElementById('json-viewer');
+
+            title.innerText = `Detalhes do CEP: ${formatarCEP(cepCodigo)}`;
+            viewer.innerText = "Carregando...";
+            modal.style.display = 'flex';
+
+            try {
+                const resp = await fetch(`/datalake/silver/cep_${cepCodigo}.json`);
+                const data = await resp.json();
+                viewer.innerText = JSON.stringify(data, null, 4);
+            } catch (err) {
+                viewer.innerText = "Erro ao buscar detalhes do CEP na camada Silver.";
+                console.error(err);
+            }
+        }
+
+        function fecharModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Fechar modal clicando fora
+        window.onclick = function(event) {
+            const modal = document.getElementById('modal');
+            if (event.target === modal) {
+                fecharModal();
+            }
+        }
+    </script>
+</body>
+</html>

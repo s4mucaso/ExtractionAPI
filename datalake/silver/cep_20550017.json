@@ -1,0 +1,18 @@
+{
+    "cep": "20550017",
+    "logradouro": "Rua São Francisco Xavier",
+    "complemento": "de 691 ao fim - lado ímpar",
+    "unidade": null,
+    "bairro": "São Francisco Xavier",
+    "localidade": "Rio de Janeiro",
+    "uf": "RJ",
+    "estado": "Rio de Janeiro",
+    "regiao": "Sudeste",
+    "ibge": "3304557",
+    "gia": null,
+    "ddd": "21",
+    "siafi": "6001",
+    "metadata_arquivo_origem": "dados_cep_20260702_112142.json",
+    "metadata_data_extracao": "2026-07-02 11:21:42",
+    "metadata_data_processamento": "2026-07-03 13:34:10"
+}

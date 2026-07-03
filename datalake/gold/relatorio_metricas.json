@@ -1,0 +1,24 @@
+{
+    "metadata": {
+        "data_geracao_relatorio": "2026-07-03 13:37:01",
+        "fonte_dados": "datalake/silver/consolidado_ceps.csv",
+        "total_registros_analisados": 3
+    },
+    "metricas": {
+        "distribuicao_por_regiao": {
+            "Sudeste": 3
+        },
+        "distribuicao_por_estado": {
+            "RJ": 2,
+            "SP": 1
+        },
+        "distribuicao_por_cidade": {
+            "Rio de Janeiro": 2,
+            "São Paulo": 1
+        },
+        "distribuicao_por_ddd": {
+            "21": 2,
+            "11": 1
+        }
+    }
+}

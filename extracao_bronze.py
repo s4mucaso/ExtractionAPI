@@ -5,7 +5,7 @@ from datetime import datetime
 
 # 1. Definimos quem vamos atacar (A URL da API Pública do ViaCEP)
 # No mundo real, aqui estaria a URL: http://api.seap.rj.gov.br/presos
-url_api = "https://viacep.com.br/ws/01001000/json/"
+url_api = "https://viacep.com.br/ws/23050102/json/"
 
 # 2. Criamos a pasta 'Bronze' no seu computador (Simulando o Data Lake)
 pasta_bronze = "./datalake/bronze/"
@@ -15,7 +15,7 @@ print("Iniciando extração da API...")
 
 # 3. O nosso Garçom (O verbo GET) batendo na porta da API
 resposta = requests.get(url_api)
-
+''
 # 4. Verificamos se deu certo (Status 200 = Sucesso na internet)
 if resposta.status_code == 200:
     # Transformamos o texto que voltou da internet num dicionário Python (JSON)
